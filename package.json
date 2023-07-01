@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
@@ -25,6 +26,7 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "mysql2": "^3.4.3",
+    "node-emoji": "^2.1.0",
     "uuidv4": "^6.2.13"
   }
 }
