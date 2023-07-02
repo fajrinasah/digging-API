@@ -1,3 +1,3 @@
 /node_modules
-/src/database/query/script.sql
+database
 .env
