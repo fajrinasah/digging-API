@@ -1,15 +1,17 @@
 import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
+import cors from "cors";
 
 import chalk from "chalk";
 import * as emoji from "node-emoji";
 
-import connection from "./src/configs/index.js";
+import connection from "./src/configs/connection.config.js";
 
 const app = express();
 dotenv.config();
 
+app.use(cors());
 app.use(bodyParser.json());
 
 connection.connect((err) => {
