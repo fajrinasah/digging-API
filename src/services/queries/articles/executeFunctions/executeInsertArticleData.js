@@ -1,4 +1,4 @@
-import { generateExecuteFunction } from "../../../../helpers/generateExecuteFunction.js";
+import { generateExecuteFunction } from "../../../../helpers/generateConnectionFunction.js";
 import { queryStatements } from "../queryStatements/index.js";
 
 /*--------------------------------------------------

@@ -1,4 +1,4 @@
-import { generateExecuteFunction } from "../../../../helpers/generateExecuteFunction.js";
+import { generateExecuteFunction } from "../../../../helpers/generateConnectionFunction.js";
 
 /*--------------------------------------------------
 SELECT ARTICLES TO DIG

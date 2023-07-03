@@ -21,3 +21,15 @@ export const generateExecuteFunction = ({
     }
   );
 };
+
+export const generateQueryFunction = ({ queryStatements = "" }) => {
+  return connection.query(queryStatements, function (err, results) {
+    if (err) {
+      console.error(err);
+      return err;
+    }
+
+    console.log(results);
+    return results;
+  });
+};
