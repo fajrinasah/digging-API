@@ -7,6 +7,9 @@ import chalk from "chalk";
 import * as emoji from "node-emoji";
 
 import connection from "./src/configs/connection.config.js";
+// import { generateExecuteFunction } from "./src/services/queries/articles/executeFunctions/index.js";
+// import { queryStatements } from "./src/services/queries/articles/queryStatements/index.js";
+import { executeCountArticlesInACategory } from "./src/services/queries/articles/executeFunctions/countArticlesInACategory.execute.js";
 
 const app = express();
 dotenv.config();
@@ -27,6 +30,8 @@ connection.connect((err) => {
 /*=======================================================*/
 //
 /*=======================================================*/
+
+executeCountArticlesInACategory({ category_id: 2 });
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

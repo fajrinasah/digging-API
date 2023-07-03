@@ -1,5 +1,5 @@
 /*--------------------------------------------------
-(SELECT) COUNT TOTAL ARTICLES OF A CATEEGORY
+(SELECT) COUNT TOTAL ARTICLES OF A CATEGORY
 ----------------------------------------------------*/
 // placeholder values:
 // [category_id]

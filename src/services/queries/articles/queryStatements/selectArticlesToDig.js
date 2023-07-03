@@ -3,7 +3,7 @@ SELECT ARTICLES TO DIG
 (with filtering and sorting)
 ----------------------------------------------------*/
 
-const selectArticlesToDig = ({
+export const selectArticlesToDig = ({
   filterByCategory = 0,
   filterByHeadline = "",
   filterByKeywords = "",

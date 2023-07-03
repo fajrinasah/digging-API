@@ -3,19 +3,14 @@ SELECT PUBLISHED ARTICLES FROM A USER
 (with filtering and sorting)
 ----------------------------------------------------*/
 
-const selectPublishedArticlesFromUser = ({
+export const selectPublishedArticlesFromUser = ({
   username = "",
   filterByCategory = 0,
   filterByHeadline = "",
   filterByKeywords = "",
   sortingOption = "DESC",
 }) => {
-  if (
-    !filterByCategory &&
-    !filterByHeadline &&
-    !filterByKeywords &&
-    sortingOption
-  ) {
+  if (!filterByCategory && !filterByHeadline && !filterByKeywords) {
     return `SELECT * FROM articles_to_dig WHERE username = ${username} ORDER BY article_id ${sortingOption} LIMIT 45`;
   }
 

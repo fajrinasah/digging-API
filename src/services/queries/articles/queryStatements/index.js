@@ -1,11 +1,11 @@
-import { countArticlesInACategory } from "./countArticlesInACategory";
-import { deleteArticleData } from "./deleteArticleData";
-import { insertArticleData } from "./insertArticleData";
-import { selectArticleData } from "./selectArticleData";
-import { selectArticlesToDig } from "./selectArticlesToDig";
-import { selectCarouselArticles } from "./selectCarouselArticles";
-import { selectPublishedArticlesFromUser } from "./selectPublishedArticlesFromUser";
-import { updateArticleData } from "./updateArticleData";
+import { countArticlesInACategory } from "./countArticlesInACategory.js";
+import { deleteArticleData } from "./deleteArticleData.js";
+import { insertArticleData } from "./insertArticleData.js";
+import { selectArticleData } from "./selectArticleData.js";
+import { selectArticlesToDig } from "./selectArticlesToDig.js";
+import { selectCarouselArticles } from "./selectCarouselArticles.js";
+import { selectPublishedArticlesFromUser } from "./selectPublishedArticlesFromUser.js";
+import { updateArticleData } from "./updateArticleData.js";
 
 export const queryStatements = {
   countArticlesInACategory,
@@ -17,14 +17,3 @@ export const queryStatements = {
   selectPublishedArticlesFromUser,
   updateArticleData,
 };
-
-// export const queryStatements = {
-//   countArticlesInACategory,
-//   deleteArticleData,
-//   insertArticleData,
-//   selectArticleData,
-//   selectArticlesToDig: () => selectArticlesToDig(),
-//   selectCarouselArticles,
-//   selectPublishedArticlesFromUser: () => selectPublishedArticlesFromUser(),
-//   updateArticleData,
-// };
