@@ -1,0 +1,7 @@
+/*--------------------------------------------------
+(SELECT) COUNT TOTAL ARTICLES OF A CATEEGORY
+----------------------------------------------------*/
+// placeholder values:
+// [category_id]
+export const countArticlesInACategory =
+  "SELECT `category_id`, COUNT(*) as `total_articles` FROM digging.articles GROUP BY  `category_id` HAVING `category_id` = ?";
