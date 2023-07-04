@@ -2,12 +2,12 @@ import { generateExecuteFunction } from "../../../../helpers/generateExecuteFunc
 import { queryStatements } from "../queryStatements/index.js";
 
 /*--------------------------------------------------
-SELECT CONSERVED ARTICLES OF A USER
+SELECT CONSERVED ARTICLES FROM A USER
 ----------------------------------------------------*/
 // placeholder values:
 // ['conservator_username']
 
-export const executeSelectConservedArticlesOfAUser = ({
+export const executeSelectConservedArticlesFromAUser = ({
   conservator_username = "",
   filterByCategory = 0,
   filterByHeadline = "",
@@ -17,7 +17,7 @@ export const executeSelectConservedArticlesOfAUser = ({
   if (!filterByCategory && !filterByHeadline && !filterByKeywords) {
     generateExecuteFunction({
       queryStatements:
-        queryStatements.selectConservedArticlesOfAUser +
+        queryStatements.selectConservedArticlesFromAUser +
         " ORDER BY article_id ? LIMIT 45",
       placeholders: [conservator_username, sortingOption],
     });
@@ -28,7 +28,7 @@ export const executeSelectConservedArticlesOfAUser = ({
   if (!filterByCategory && !filterByHeadline) {
     generateExecuteFunction({
       queryStatements:
-        queryStatements.selectConservedArticlesOfAUser +
+        queryStatements.selectConservedArticlesFromAUser +
         " AND keywords LIKE ? ORDER BY article_id ? LIMIT 45",
       placeholders: [
         conservator_username,
@@ -43,7 +43,7 @@ export const executeSelectConservedArticlesOfAUser = ({
   if (!filterByCategory && !filterByKeywords) {
     generateExecuteFunction({
       queryStatements:
-        queryStatements.selectConservedArticlesOfAUser +
+        queryStatements.selectConservedArticlesFromAUser +
         " AND headline LIKE ? ORDER BY article_id ? LIMIT 45",
       placeholders: [
         conservator_username,
@@ -58,7 +58,7 @@ export const executeSelectConservedArticlesOfAUser = ({
   if (!filterByHeadline) {
     generateExecuteFunction({
       queryStatements:
-        queryStatements.selectConservedArticlesOfAUser +
+        queryStatements.selectConservedArticlesFromAUser +
         " AND category_id = ? AND keywords LIKE ? ORDER BY article_id ? LIMIT 45",
       placeholders: [
         conservator_username,
@@ -74,7 +74,7 @@ export const executeSelectConservedArticlesOfAUser = ({
   if (!filterByKeywords) {
     generateExecuteFunction({
       queryStatements:
-        queryStatements.selectConservedArticlesOfAUser +
+        queryStatements.selectConservedArticlesFromAUser +
         " AND category_id = ? AND headline LIKE ? ORDER BY article_id ? LIMIT 45",
       placeholders: [
         conservator_username,
