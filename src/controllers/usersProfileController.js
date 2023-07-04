@@ -1,6 +1,6 @@
 import { usersProfile } from "../services/queries/users_profile/index.js";
 
-export const userProfileController = {
+export const usersProfileController = {
   /*------------------------------------------------------------
   GET
   -------------------------------------------------------------*/

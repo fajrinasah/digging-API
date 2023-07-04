@@ -19,10 +19,10 @@ export const articlesController = {
   // GET ARTICLES TO DIG
   getArticlesToDig: (req, res) => {
     // get data from req query (if any)
-    const categoryId = req.query.categoryId ? req.query.categoryId : 0;
-    const headline = req.query.headline ? req.query.headline : "";
-    const keywords = req.query.keywords ? req.query.keywords : "";
-    const sort = req.query.sort ? req.query.sort : "DESC";
+    const categoryId = req.query?.categoryId ? req.query.categoryId : 0;
+    const headline = req.query?.headline ? req.query.headline : "";
+    const keywords = req.query?.keywords ? req.query.keywords : "";
+    const sort = req.query?.sort ? req.query.sort : "DESC";
 
     articles.executeSelectArticlesToDig({
       filterByCategory: categoryId,
@@ -40,7 +40,7 @@ export const articlesController = {
 
   // GET CAROUSEL ARTICLES
   getCarouselArticles: (req, res) => {
-    const { totalArticles } = req.query;
+    const { totalArticles } = req.params;
     articles.executeSelectCarouselArticles({ limit: totalArticles });
 
     if (err) {
@@ -130,8 +130,9 @@ export const articlesController = {
   PATCH
   -------------------------------------------------------------*/
   patchArticleData: (req, res) => {
+    const { articleId } = req.params;
+
     const {
-      articleId,
       categoryId,
       headline,
       subheadline,
