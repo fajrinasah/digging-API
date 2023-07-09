@@ -1,20 +1,14 @@
-// import Sequelize from "sequelize";
-const Sequelize = require("sequelize").Sequelize;
-import dotenv from "dotenv";
-import process from "process";
-
-dotenv.config();
+import Sequelize from "sequelize";
+// const Sequelize = require("sequelize").Sequelize;
 import config from "../configs/index.js";
 
 // SEQUELIZE CONNECTION
 const db = {};
-const env = process.env.NODE_ENV || "development";
-const configuration = config[env];
 const sequelize = new Sequelize(
-  configuration.database,
-  configuration.username,
-  configuration.password,
-  configuration
+  config.database,
+  config.username,
+  config.password,
+  config
 );
 
 db.sequelize = sequelize;

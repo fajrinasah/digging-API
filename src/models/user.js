@@ -4,53 +4,59 @@ import db from "./index.js";
 export const User = db.sequelize.define(
   "user",
   {
-    user_id: {
+    id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true,
       allowNull: false,
+      autoIncrement: true,
     },
 
     uuid: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
       unique: true,
     },
 
     email: {
-      type: DataTypes.STRING,
-      unique: true,
+      type: DataTypes.STRING(45),
       allowNull: false,
+      unique: true,
     },
 
     phone_number: {
-      type: DataTypes.STRING,
-      unique: true,
+      type: DataTypes.STRING(15),
       allowNull: false,
+      unique: true,
     },
 
     username: {
-      type: DataTypes.STRING,
-      unique: true,
+      type: DataTypes.STRING(20),
       allowNull: false,
+      unique: true,
     },
 
     password: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(255),
       allowNull: false,
     },
 
-    role: {
-      type: DataTypes.STRING,
-      defaultValue: "user",
+    role_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 2,
     },
 
-    is_verified: {
-      type: DataTypes.BOOLEAN,
+    status_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
       defaultValue: 0,
     },
   },
   {
     tableName: "users",
+    timestamps: true,
+    createdAt: "created_at",
+    updatedAt: "updated_at",
   }
 );

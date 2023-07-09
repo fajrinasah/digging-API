@@ -3,27 +3,16 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import cors from "cors";
 import db from "./src/models/index.js";
+// import { associations } from "./src/models/associations.js";
 
 import chalk from "chalk";
 import * as emoji from "node-emoji";
-
-// import connection from "./src/configs/connection.config.js";
 
 const app = express();
 dotenv.config();
 
 app.use(bodyParser.json());
 app.use(cors({ exposedHeaders: "Authorization" }));
-
-// connection.connect((err) => {
-//   if (err) {
-//     return console.error(`error: ${err.message}`);
-//   }
-//   console.log(
-//     chalk.white.bgGreenBright.bold(`Connected to the database`) +
-//       emoji.get("white_check_mark")
-//   );
-// });
 
 async function testConnection() {
   try {
@@ -38,6 +27,19 @@ async function testConnection() {
 }
 
 testConnection();
+
+// async function syncSequelize() {
+//   try {
+//     associations();
+//     await db.sequelize.sync({ force: true });
+//     console.log(
+//       "All models were synchronized successfully." +
+//         emoji.get("white_check_mark")
+//     );
+//   } catch (error) {
+//     console.error("Unable to synchronize models:", error);
+//   }
+// }
 
 /*=======================================================*/
 //

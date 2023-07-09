@@ -4,11 +4,11 @@ import db from "./index.js";
 export const Article = db.sequelize.define(
   "article",
   {
-    article_id: {
+    id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true,
       allowNull: false,
+      autoIncrement: true,
     },
 
     profile_id: {
@@ -18,7 +18,7 @@ export const Article = db.sequelize.define(
 
     category_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      defaultValue: null,
     },
 
     headline: {
@@ -58,10 +58,13 @@ export const Article = db.sequelize.define(
 
     references: {
       type: DataTypes.TEXT("tiny"),
-      allowNull: true,
+      defaultValue: null,
     },
   },
   {
     tableName: "articles",
+    timestamps: true,
+    createdAt: "created_at",
+    updatedAt: "updated_at",
   }
 );

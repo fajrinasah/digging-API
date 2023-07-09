@@ -4,20 +4,21 @@ import db from "./index.js";
 export const Category = db.sequelize.define(
   "category",
   {
-    category_id: {
+    id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true,
       allowNull: false,
+      autoIncrement: true,
     },
 
-    category_name: {
-      type: DataTypes.STRING,
-      unique: true,
+    category: {
+      type: DataTypes.STRING(45),
       allowNull: false,
+      unique: true,
     },
   },
   {
     tableName: "categories",
+    timestamps: false,
   }
 );

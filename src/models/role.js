@@ -1,8 +1,8 @@
 import { DataTypes } from "sequelize";
 import db from "./index.js";
 
-export const Conservation = db.sequelize.define(
-  "conservation",
+export const Role = db.sequelize.define(
+  "role",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -11,17 +11,14 @@ export const Conservation = db.sequelize.define(
       autoIncrement: true,
     },
 
-    conservator_id: {
-      type: DataTypes.INTEGER,
+    role: {
+      type: DataTypes.STRING(45),
       allowNull: false,
-    },
-
-    article_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+      unique: true,
     },
   },
   {
-    tableName: "conservations",
+    tableName: "roles",
+    timestamps: false,
   }
 );
