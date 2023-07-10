@@ -78,6 +78,12 @@ main h1 {
   text-align: center;
 }
 
+.identifier {
+  font-weight: bold;
+  color: var(--main);
+  background-color: var(--contrast);
+}
+
 main a {
   padding: 2rem 0 5rem 0;
 

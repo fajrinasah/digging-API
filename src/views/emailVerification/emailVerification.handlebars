@@ -32,17 +32,18 @@
     place-content: center; place-items: center; } main h1 { width: 80%; padding:
     3rem 0; border-bottom: 2px solid var(--contrast); font-family: "Amaranth",
     sans-serif; font-size: 4rem; font-weight: 200; text-align: center; }
-    .primary-info { padding: 5rem 0 2rem 0; text-align: center; } main a {
-    padding: 2rem 0 5rem 0; font-size: 2.5rem; font-weight: bold; color:
-    var(--contrast); transition: all 3ms ease-in-out; } main a:hover { color:
-    var(--accent); transform: scale(0.95); } .additional-info { text-align:
-    center; } footer { display: flex; place-content: center; place-items:
-    center; width: 100%; margin-top: 5rem; padding-top: 3px; border-top: 1px
-    solid var(--contrast); } .social-accounts-group { display: flex;
-    place-content: center; place-items: center; width: 100%; padding: 3rem 0;
-    border-top: 2px solid var(--contrast); } .link-social-account { width: 40px;
-    height: 40px; place-content: center; place-items: center; margin: 0 1rem;
-    border-radius: 2px; background-color: var(--accent); display: flex;
+    .primary-info { padding: 5rem 0 2rem 0; text-align: center; } .identifier {
+    font-weight: bold; color: var(--main); background-color: var(--contrast); }
+    main a { padding: 2rem 0 5rem 0; font-size: 2.5rem; font-weight: bold;
+    color: var(--contrast); transition: all 3ms ease-in-out; } main a:hover {
+    color: var(--accent); transform: scale(0.95); } .additional-info {
+    text-align: center; } footer { display: flex; place-content: center;
+    place-items: center; width: 100%; margin-top: 5rem; padding-top: 3px;
+    border-top: 1px solid var(--contrast); } .social-accounts-group { display:
+    flex; place-content: center; place-items: center; width: 100%; padding: 3rem
+    0; border-top: 2px solid var(--contrast); } .link-social-account { width:
+    40px; height: 40px; place-content: center; place-items: center; margin: 0
+    1rem; border-radius: 2px; background-color: var(--accent); display: flex;
     place-content: center; place-items: center; transition: all 3ms ease-in-out;
     } .link-social-account:hover { background-color: transparent; }
     .link-of-social-account { font-size: 25px; background-color: var(--accent);
@@ -58,7 +59,7 @@
       <h1>Email Address Verification</h1>
       <p class="primary-info">
         You have entered
-        {{email}}
+        <span class="identifier">{{email}}</span>
         as the email address for your account.
         <br />
         <br />
