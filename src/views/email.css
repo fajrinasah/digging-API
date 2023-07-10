@@ -1,0 +1,155 @@
+:root {
+  --main: #eee3c4;
+  --contrast: #302314;
+  --accent: #7c1f1b;
+}
+
+*,
+::after,
+::before {
+  box-sizing: border-box;
+  padding: 0px;
+  margin: 0px;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-family: "B612", sans-serif;
+  font-size: 1.8rem;
+  color: var(--contrast);
+  background-color: var(--main);
+}
+
+.sr-only {
+  border: 0 !important;
+  clip: rect(1px, 1px, 1px, 1px) !important;
+  -webkit-clip-path: inset(50%) !important;
+  clip-path: inset(50%) !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  position: absolute !important;
+  width: 1px !important;
+  white-space: nowrap !important;
+}
+
+header {
+  border-bottom: 3px solid var(--contrast);
+}
+
+.logo {
+  display: flex;
+  place-content: center;
+  width: 100%;
+  margin-bottom: 5px;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--contrast);
+
+  font-family: "Caesar Dressing", serif;
+  font-size: 8rem;
+  letter-spacing: 0.3rem;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  place-content: center;
+  place-items: center;
+}
+
+main h1 {
+  width: 80%;
+  padding: 3rem 0;
+  border-bottom: 2px solid var(--contrast);
+
+  font-family: "Amaranth", sans-serif;
+  font-size: 4rem;
+  font-weight: 200;
+  text-align: center;
+}
+
+.primary-info {
+  padding: 5rem 0 2rem 0;
+
+  text-align: center;
+}
+
+main a {
+  padding: 2rem 0 5rem 0;
+
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--contrast);
+
+  transition: all 3ms ease-in-out;
+}
+
+main a:hover {
+  color: var(--accent);
+  transform: scale(0.95);
+}
+
+.additional-info {
+  text-align: center;
+}
+
+footer {
+  display: flex;
+  place-content: center;
+  place-items: center;
+
+  width: 100%;
+  margin-top: 5rem;
+  padding-top: 3px;
+
+  border-top: 1px solid var(--contrast);
+}
+
+.social-accounts-group {
+  display: flex;
+  place-content: center;
+  place-items: center;
+  width: 100%;
+  padding: 3rem 0;
+  border-top: 2px solid var(--contrast);
+}
+
+.link-social-account {
+  width: 40px;
+  height: 40px;
+
+  place-content: center;
+  place-items: center;
+
+  margin: 0 1rem;
+
+  border-radius: 2px;
+
+  background-color: var(--accent);
+
+  display: flex;
+  place-content: center;
+  place-items: center;
+
+  transition: all 3ms ease-in-out;
+}
+
+.link-social-account:hover {
+  background-color: transparent;
+}
+
+.link-of-social-account {
+  font-size: 25px;
+
+  background-color: var(--accent);
+  color: var(--main);
+}
+
+.link-of-social-account:hover {
+  color: var(--accent);
+  background-color: transparent;
+}
