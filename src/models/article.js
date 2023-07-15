@@ -52,7 +52,7 @@ export const Article = db.sequelize.define(
     },
 
     content: {
-      type: DataTypes.TEXT("tiny"),
+      type: DataTypes.TEXT("long"),
       allowNull: false,
     },
 

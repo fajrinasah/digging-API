@@ -52,6 +52,16 @@ export const User = db.sequelize.define(
       allowNull: false,
       defaultValue: 1,
     },
+
+    otp: {
+      type: DataTypes.STRING(10),
+      defaultValue: null,
+    },
+
+    otp_exp: {
+      type: DataTypes.DATE,
+      defaultValue: null,
+    },
   },
   {
     tableName: "users",
