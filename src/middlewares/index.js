@@ -1,9 +1,4 @@
-import { errorHandler } from "./globalErrorHandler/errorHandler.js";
-import { verifyStatus } from "./verifyFromToken/verifyStatus.js";
-import { verifyUser } from "./verifyFromToken/verifyUser.js";
-
-export const middlewares = {
-  errorHandler,
-  verifyStatus,
-  verifyUser,
-};
+export * from "./globalErrorHandler/errorHandler.js";
+export * from "./loggers/requestLogger.js";
+export * from "./verifyFromToken/verifyStatus.js";
+export * from "./verifyFromToken/verifyUser.js";
