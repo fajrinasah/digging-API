@@ -32,7 +32,7 @@ export const Article = db.sequelize.define(
     },
 
     mainshot: {
-      type: DataTypes.TEXT("tiny"),
+      type: DataTypes.STRING(255),
       allowNull: false,
     },
 

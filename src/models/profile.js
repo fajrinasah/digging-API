@@ -22,7 +22,7 @@ export const Profile = db.sequelize.define(
     },
 
     photo_profile: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(255),
       defaultValue: null,
     },
 
