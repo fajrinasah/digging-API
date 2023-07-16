@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import db from "./index.js";
+import db from "../database/index.js";
 
 export const Status = db.sequelize.define(
   "status",

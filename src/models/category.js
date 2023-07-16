@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import db from "./index.js";
+import db from "../database/index.js";
 
 export const Category = db.sequelize.define(
   "category",
