@@ -1,6 +1,9 @@
 import * as Yup from "yup";
 
-export const ProfileValidationSchema = {
+/*----------------------------------------------------
+DISPLAY NAME VALIDATION SCHEMA
+-----------------------------------------------------*/
+export const displayNameValidationSchema = {
   display_name: Yup.string().max(
     45,
     "Display name's maximum length is 45 characters."
