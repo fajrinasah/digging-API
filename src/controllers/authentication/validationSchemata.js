@@ -1,6 +1,6 @@
 import * as Yup from "yup";
 
-export const RegisterValidationSchema = Yup.object({
+export const registerValidationSchema = Yup.object({
   email: Yup.string()
     .required("Email is required.")
     .email("Email must be valid.")
@@ -61,14 +61,14 @@ export const usernameValidationSchema = Yup.object({
 });
 
 export const isUsername = async (username) => {
-  return await EmailValidationSchema.isValid({ username });
+  return await usernameValidationSchema.isValid({ username });
 };
 
 /*----------------------------------------------------
 IF USER LOG IN WITH EMAIL
 -----------------------------------------------------*/
 
-export const EmailValidationSchema = Yup.object({
+export const emailValidationSchema = Yup.object({
   email: Yup.string()
     .required("Email is required.")
     .email("Email must be valid.")
@@ -81,14 +81,14 @@ export const EmailValidationSchema = Yup.object({
 });
 
 export const isEmail = async (email) => {
-  return await EmailValidationSchema.isValid({ email });
+  return await emailValidationSchema.isValid({ email });
 };
 
 /*----------------------------------------------------
 IF USER LOG IN WITH PHONE NUMBER
 -----------------------------------------------------*/
 
-export const PhoneNumberValidationSchema = Yup.object({
+export const phoneNumberValidationSchema = Yup.object({
   phone_number: Yup.string()
     .required("Phone number is required.")
     .min(10, "Phone number's length should be between 10 to 15 digits.")
@@ -97,5 +97,18 @@ export const PhoneNumberValidationSchema = Yup.object({
 });
 
 export const isPhoneNumber = async (phone_number) => {
-  return await EmailValidationSchema.isValid({ phone_number });
+  return await phoneNumberValidationSchema.isValid({ phone_number });
 };
+
+/*----------------------------------------------------
+PASSWORD VALIDATION SCHEMA
+-----------------------------------------------------*/
+export const passwordValidationSchema = Yup.object({
+  password: Yup.string()
+    .required("Password is required.")
+    .min(6, "Password must be at least 6 characters.")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
+      "Password must contain at least 1 letter, at least 1 uppercase letter, and at least 1 symbol. Symbols that can be used are @$!%*?&"
+    ),
+});

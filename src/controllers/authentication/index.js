@@ -13,6 +13,7 @@ import * as errorMessage from "../../middlewares/globalErrorHandler/errorMessage
 import { User, Profile } from "../../models/associations/user.profile.js";
 import db from "../../database/index.js";
 import * as validation from "./validationSchemata.js";
+import chalk from "chalk";
 
 const client = redis.createClient();
 client.on("error", (err) => console.log("Redis Client Error", err));
@@ -22,13 +23,13 @@ client.on("error", (err) => console.log("Redis Client Error", err));
 // REGISTER
 /*----------------------------------------------------*/
 export const register = async (req, res, next) => {
-  try {
-    // START TRANSACTION
-    const transaction = await db.sequelize.transaction();
+  // START TRANSACTION
+  const transaction = await db.sequelize.transaction();
 
+  try {
     // VALIDATE DATA
     const { email, phone_number, username, password } = req.body;
-    await validation.RegisterValidationSchema.validate(req.body);
+    await validation.registerValidationSchema.validate(req.body);
 
     // CHECK IF USER ALREADY EXIST
     const userExist = await User?.findOne({
@@ -81,12 +82,14 @@ export const register = async (req, res, next) => {
     const emailTemplate = fs.readFileSync(
       path.join(
         process.cwd(),
+        "src",
         "views",
         "emailVerification",
         "emailVerification.html"
       ),
       "utf8"
     );
+
     const emailData = handlebars.compile(emailTemplate)({
       email,
       otpToken,
@@ -113,8 +116,86 @@ export const register = async (req, res, next) => {
 
     // IF ERROR FROM VALIDATION
     if (error instanceof ValidationError) {
-      return next({ status: 400, message: error?.errors?.[0] });
+      console.error(chalk.bgRedBright("Validation Error: "));
+
+      return next({
+        status: errorStatus.BAD_REQUEST_STATUS,
+        message: error?.errors?.[0],
+      });
     }
+
+    next(error);
+  }
+};
+
+/*----------------------------------------------------*/
+// RE-SEND EMAIL VERIFICATION
+/*----------------------------------------------------*/
+export const resendEmailVerification = async (req, res, next) => {
+  // START TRANSACTION
+  const transaction = await db.sequelize.transaction();
+
+  try {
+    const { email } = req.body;
+
+    // CHECK IF USER EXIST
+    const user = await User?.findOne({ where: { email: email } });
+    if (!user)
+      throw {
+        status: errorStatus.BAD_REQUEST_STATUS,
+        message: errorMessage.USER_DOES_NOT_EXISTS,
+      };
+
+    // GENERATE OTP TOKEN FOR VERIFICATION PROCESS
+    const otpToken = helpers.generateOtp();
+
+    await User?.update(
+      {
+        otp: otpToken,
+        otp_exp: moment().add(1, "days").format("YYYY-MM-DD HH:mm:ss"),
+      },
+      { where: { email } }
+    );
+
+    // COMPOSE "EMAIL VERIFICATION" MAIL
+    const emailTemplate = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "src",
+        "views",
+        "emailVerification",
+        "emailVerification.html"
+      ),
+      "utf8"
+    );
+
+    const emailData = handlebars.compile(emailTemplate)({
+      email,
+      otpToken,
+      link: config.REDIRECT_URL + `/auth/verify/reg-${user?.dataValues?.uuid}`,
+    });
+
+    // SEND "EMAIL VERIFICATION" MAIL
+    const mailOptions = {
+      from: config.GMAIL,
+      to: email,
+      subject: "Email Verification",
+      html: emailData,
+    };
+    helpers.transporter.sendMail(mailOptions, (error, info) => {
+      if (error) throw error;
+      console.log("Email was sent successfully: " + info.response);
+    });
+
+    res.status(200).json({
+      message: "Email verification was sent successfully.",
+    });
+
+    // COMMIT TRANSACTION
+    await transaction.commit();
+  } catch (error) {
+    // ROLLBACK TRANSACTION IF THERE'S ANY ERROR
+    await transaction.rollback();
 
     next(error);
   }
@@ -124,12 +205,13 @@ export const register = async (req, res, next) => {
 // VERIFY
 /*----------------------------------------------------*/
 export const verify = async (req, res, next) => {
-  try {
-    const { uuid, token } = req.body;
+  const { uuidWithContext } = req.params;
+  const { token } = req.body;
 
+  try {
     // CHECK CONTEXT FROM UUID PREFIX
-    const context = uuid.split("-")[0];
-    const cleanedUuid = uuid.split("-")?.slice(1)?.join("-");
+    const context = uuidWithContext.split("-")[0];
+    const cleanedUuid = uuidWithContext.split("-")?.slice(1)?.join("-");
 
     // CHECK IF USER EXIST
     const user = await User?.findOne({ where: { uuid: cleanedUuid } });
@@ -143,7 +225,7 @@ export const verify = async (req, res, next) => {
     if (token !== user?.dataValues?.otp)
       throw {
         status: errorStatus.BAD_REQUEST_STATUS,
-        message: errorMessage.INVALID_CREDENTIALS,
+        message: errorMessage.INVALID_CREDENTIALS + `: wrong OTP token.`,
       };
 
     // CHECK TOKEN'S EXPIRE DATE/TIME
@@ -151,22 +233,28 @@ export const verify = async (req, res, next) => {
     if (isExpired)
       throw {
         status: errorStatus.BAD_REQUEST_STATUS,
-        message: errorMessage.INVALID_CREDENTIALS,
+        message: errorMessage.INVALID_CREDENTIALS + `: OTP token has expired.`,
       };
 
-    // DO QUERY BASED ON CONTEXT
+    // DO ACTIONS BASED ON CONTEXT
     if (context === "reg") {
       // UPDATE USER'S STATUS
       await User?.update(
-        { status: 2, otp: null, otp_exp: null },
+        { status_id: 2, otp: null, otp_exp: null },
         { where: { uuid: cleanedUuid } }
       );
+
+      // SEND RESPONSE
+      res.status(200).json({
+        message: "Account was verified successfully.",
+        data: cleanedUuid,
+      });
     }
 
     // SEND RESPONSE
-    res
-      .status(200)
-      .json({ message: "Account was verified successfully.", data: uuid });
+    res.status(200).json({
+      message: "Successfully verified.",
+    });
   } catch (error) {
     next(error);
   }
@@ -194,10 +282,8 @@ export const login = async (req, res, next) => {
       : { username: data };
 
     // CHECK IF USER EXIST
-    // INCLUDES PROFILE IN THE RESULT
     const userExists = await User?.findOne({
       where: whereQuery,
-      include: Profile,
     });
 
     if (!userExists)
@@ -206,12 +292,13 @@ export const login = async (req, res, next) => {
         message: errorMessage.USER_DOES_NOT_EXISTS,
       };
 
-    // CHECK USER'S STATUS (1: unverified, 2: verified, 3: deactivated)
-    if (userExists?.dataValues?.status === 3)
+    // CHECK USER'S STATUS (1: not verified, 2: verified, 3: deactivated)
+    if (userExists?.dataValues?.status === 3) {
       throw {
         status: errorStatus.BAD_REQUEST_STATUS,
         message: errorMessage.USER_DOES_NOT_EXISTS,
       };
+    }
 
     // CHECK IF PASSWORD CORRECT
     const isPasswordCorrect = helpers.compare(
@@ -219,13 +306,15 @@ export const login = async (req, res, next) => {
       userExists?.dataValues?.password
     );
 
-    if (!isPasswordCorrect)
+    if (!isPasswordCorrect) {
       throw {
         status: errorStatus.BAD_REQUEST_STATUS,
-        message: errorMessage.USER_DOES_NOT_EXISTS,
+        message: errorMessage.INVALID_CREDENTIALS + `: wrong password`,
       };
+    }
 
     // CHECK TOKEN IN REDIS
+    client.connect();
     const cachedToken = await client.get(userExists?.dataValues?.uuid);
     const tokenIsValid = cachedToken && helpers.verifyToken(cachedToken);
 
@@ -247,16 +336,24 @@ export const login = async (req, res, next) => {
       });
     }
 
+    // GET USER'S PROFILE FROM DB
+    const profile = await Profile.findOne({
+      where: { user_id: userExists?.dataValues?.id },
+    });
+
     // CLEAN UP DATA BEFORE SEND A RESPONSE
+    delete userExists?.dataValues?.id;
     delete userExists?.dataValues?.password;
     delete userExists?.dataValues?.otp;
     delete userExists?.dataValues?.otp_exp;
+    delete profile?.dataValues?.id;
+    delete profile?.dataValues?.user_id;
 
     // SEND RESPONSE
     res
       .header("Authorization", `Bearer ${accessToken}`)
       .status(200)
-      .json({ user: userExists });
+      .json({ user: userExists, profile: profile });
   } catch (error) {
     // CHECK IF THE ERROR COMES FROM VALIDATION
     if (error instanceof ValidationError) {
@@ -279,15 +376,21 @@ export const keepLogin = async (req, res, next) => {
     const { uuid } = req.user;
 
     // GET USER'S DATA AND PROFILE
-    const user = await User?.findOne({ where: { uuid }, include: Profile });
+    const user = await User?.findOne({ where: { uuid } });
+    const profile = await Profile?.findOne({
+      where: { user_id: user?.dataValues?.id },
+    });
 
     // CLEAN UP DATA BEFORE SEND A RESPONSE
+    delete user?.dataValues?.id;
     delete user?.dataValues?.password;
     delete user?.dataValues?.otp;
     delete user?.dataValues?.otp_exp;
+    delete profile?.dataValues?.id;
+    delete profile?.dataValues?.user_id;
 
     // SEND RESPONSE
-    res.status(200).json({ user });
+    res.status(200).json({ user, profile });
   } catch (error) {
     next(error);
   }
@@ -331,11 +434,19 @@ export const requestOtp = async (req, res, next) => {
       "utf8"
     );
 
+    // UUID CONTEXT IN REDIRECT URL BASED ON CONTEXT FROM REQ.BODY
+    /*----------------------------------------------------------
+    "reset password" = rpw
+    "change data" = cdt
+        --> for change password, email, username, or phone number
+    -----------------------------------------------------------*/
+    const linkContext = context === "reset password" ? "rpw" : "cdt";
+
     const emailData = handlebars.compile(template)({
       otpToken,
       link:
         config.REDIRECT_URL +
-        `/auth/verify/${context}-${user?.dataValues?.uuid}`,
+        `/auth/verify/${linkContext}-${user?.dataValues?.uuid}`,
     });
 
     // SEND EMAIL
@@ -352,8 +463,232 @@ export const requestOtp = async (req, res, next) => {
     });
 
     // SEND RESPONSE
-    res.status(200).json({ message: "Otp token requested successfully" });
+    res.status(200).json({
+      message:
+        "OTP token was sent successfully. Pleasse check your email to verify.",
+    });
   } catch (error) {
+    next(error);
+  }
+};
+
+/*----------------------------------------------------*/
+// RESET PASSWORD
+/*----------------------------------------------------*/
+export const resetPassword = async (req, res, next) => {
+  const transaction = db.sequelize.transaction();
+
+  try {
+    const { uuid } = req.user;
+    const { password } = req.body;
+    await validation.passwordValidationSchema.validate(req.body);
+
+    // ENCRYPT USER'S PASSWORD
+    const hashedPassword = helpers.hash(password);
+
+    // UPDATE USER'S PASSWORD IN DB
+    await User?.update({ password: hashedPassword }, { where: { uuid } });
+
+    // COMMIT TRANSACTION
+    await transaction.commit();
+    res.status(200).json({
+      message: "Password was successfully reset.",
+    });
+  } catch (error) {
+    // ROLLBACK TRANSACTION IF THERE'S ANY ERROR
+    await transaction.rollback();
+
+    next(error);
+  }
+};
+
+/*----------------------------------------------------*/
+// CHANGE EMAIL
+/*----------------------------------------------------*/
+export const changeEmail = async (req, res, next) => {
+  const transaction = db.sequelize.transaction();
+
+  try {
+    const { uuid } = req.user;
+    const { email } = req.body;
+    await validation.emailValidationSchema.validate(req.body);
+
+    // CHECK IF USER EXISTS
+    const user = await User?.findOne({ where: { uuid } });
+    if (!user)
+      throw {
+        status: errorStatus.BAD_REQUEST_STATUS,
+        message: errorMessage.USER_DOES_NOT_EXISTS,
+      };
+
+    // GENERATE OTP TOKEN FOR VERIFICATION PROCESS
+    const otpToken = helpers.generateOtp();
+
+    // UPDATE USER'S DATA
+    await User?.update(
+      {
+        email,
+        otp: otpToken,
+        otp_exp: moment().add(1, "days").format("YYYY-MM-DD HH:mm:ss"),
+      },
+      { where: { uuid } }
+    );
+
+    // COMPOSE "EMAIL VERIFICATION" MAIL
+    const emailTemplate = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        "src",
+        "views",
+        "emailVerification",
+        "emailVerification.html"
+      ),
+      "utf8"
+    );
+
+    const emailData = handlebars.compile(emailTemplate)({
+      email,
+      otpToken,
+      link: config.REDIRECT_URL + `/auth/verify/cdt-${user?.dataValues?.uuid}`,
+    });
+
+    // SEND "EMAIL VERIFICATION" MAIL
+    const mailOptions = {
+      from: config.GMAIL,
+      to: email,
+      subject: "Email Verification",
+      html: emailData,
+    };
+    helpers.transporter.sendMail(mailOptions, (error, info) => {
+      if (error) throw error;
+      console.log("Email was sent successfully: " + info.response);
+    });
+
+    // COMMIT TRANSACTION
+    await transaction.commit();
+
+    // SEND RESPONSE
+    res.status(200).json({
+      message: "Email was successfully changed.",
+    });
+  } catch (error) {
+    // ROLLBACK TRANSACTION IF THERE'S ANY ERROR
+    await transaction.rollback();
+
+    next(error);
+  }
+};
+
+/*----------------------------------------------------*/
+// CHANGE PHONE NUMBER
+/*----------------------------------------------------*/
+
+export const changePhoneNumber = async (req, res, next) => {
+  const transaction = db.sequelize.transaction();
+
+  try {
+    const { uuid } = req.user;
+    const { phone_number } = req.body;
+    await validation.phoneNumberValidationSchema.validate(req.body);
+
+    // CHECK IF USER EXISTS
+    const user = await User?.findOne({ where: { uuid } });
+    if (!user)
+      throw {
+        status: errorStatus.BAD_REQUEST_STATUS,
+        message: errorMessage.USER_DOES_NOT_EXISTS,
+      };
+
+    // UPDATE USER'S DATA
+    await User?.update({ phone_number }, { where: { uuid } });
+
+    // COMMIT TRANSACTION
+    await transaction.commit();
+
+    // SEND RESPONSE
+    res.status(200).json({
+      message: "Phone number was successfully changed.",
+    });
+  } catch (error) {
+    // ROLLBACK TRANSACTION IF THERE'S ANY ERROR
+    await transaction.rollback();
+
+    next(error);
+  }
+};
+
+/*----------------------------------------------------*/
+// CHANGE USERNAME
+/*----------------------------------------------------*/
+export const changeUsername = async (req, res, next) => {
+  const transaction = db.sequelize.transaction();
+
+  try {
+    const { uuid } = req.user;
+    const { username } = req.body;
+    await validation.usernameValidationSchema.validate(req.body);
+
+    // CHECK IF USER EXISTS
+    const user = await User?.findOne({ where: { uuid } });
+    if (!user)
+      throw {
+        status: errorStatus.BAD_REQUEST_STATUS,
+        message: errorMessage.USER_DOES_NOT_EXISTS,
+      };
+
+    // UPDATE USER'S DATA
+    await User?.update({ username }, { where: { uuid } });
+
+    // COMMIT TRANSACTION
+    await transaction.commit();
+
+    // SEND RESPONSE
+    res.status(200).json({
+      message: "Username was successfully changed.",
+    });
+  } catch (error) {
+    // ROLLBACK TRANSACTION IF THERE'S ANY ERROR
+    await transaction.rollback();
+
+    next(error);
+  }
+};
+/*----------------------------------------------------*/
+// CHANGE PASSWORD
+/*----------------------------------------------------*/
+export const changePassword = async (req, res, next) => {
+  const transaction = db.sequelize.transaction();
+
+  try {
+    const { uuid } = req.user;
+    const { password } = req.body;
+    await validation.passwordValidationSchema.validate(req.body);
+
+    // CHECK IF USER EXISTS
+    const user = await User?.findOne({ where: { uuid } });
+    if (!user)
+      throw {
+        status: errorStatus.BAD_REQUEST_STATUS,
+        message: errorMessage.USER_DOES_NOT_EXISTS,
+      };
+
+    // ENCRYPT USER'S PASSWORD
+    const hashedPassword = helpers.hash(password);
+
+    // UPDATE USER'S DATA
+    await User?.update({ password: hashedPassword }, { where: { uuid } });
+
+    // COMMIT TRANSACTION
+    await transaction.commit();
+
+    // SEND RESPONSE
+    res.status(200).json({
+      message: "Password was successfully changed.",
+    });
+  } catch (error) {
+    // ROLLBACK TRANSACTION IF THERE'S ANY ERROR
+    await transaction.rollback();
+
     next(error);
   }
 };
