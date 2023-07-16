@@ -57,7 +57,7 @@ export const Article = db.sequelize.define(
     },
 
     references: {
-      type: DataTypes.TEXT("tiny"),
+      type: DataTypes.TEXT,
       defaultValue: null,
     },
   },
