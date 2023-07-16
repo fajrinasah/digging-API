@@ -10,7 +10,9 @@ export async function verifyStatus(req, res, next) {
 
     const decoded = verifyToken(token);
 
-    if (decoded?.status !== 2) throw { message: errorMessage.UNAUTHORIZED };
+    if (decoded?.status_id !== 2) throw { message: errorMessage.UNAUTHORIZED };
+
+    req.user = decoded;
 
     next();
   } catch (error) {

@@ -1,6 +1,6 @@
 import chalk from "chalk";
 
 export function requestLogger(req, res, next) {
-  console.log(chalk.bgYellow(`[${req.method}]`) + ` ${req.url}`);
+  console.log(chalk.bgYellowBright(`[${req.method}]`) + ` ${req.url}`);
   next();
 }
