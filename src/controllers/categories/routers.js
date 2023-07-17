@@ -8,6 +8,6 @@ const router = Router();
 GET
 - getAllCategories
 -------------------------------------------------------------*/
-router.get("/categories", categoriesControllers.getAllCategories);
+router.get("/", categoriesControllers.getAllCategories);
 
 export default router;

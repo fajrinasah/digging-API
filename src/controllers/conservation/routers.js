@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { verifyUser, verifyStatus } from "../../middlewares/index.js";
+import { verifyStatus } from "../../middlewares/index.js";
 import * as conservationControllers from "./index.js";
 
 const router = Router();
@@ -10,7 +10,7 @@ POST
 - postConservation
 -------------------------------------------------------------*/
 router.post(
-  "/conservations/conserve/:articleId",
+  "/conserve/:articleId",
   verifyStatus,
   conservationControllers.postConservation
 );
@@ -21,18 +21,12 @@ GET
 - getMostConservedArticles
 - getTotalConservators
 -------------------------------------------------------------*/
-router.get(
-  "/conservations/:username",
-  conservationControllers.getConservedArticlesFromUser
-);
+router.get("/:username", conservationControllers.getConservedArticlesFromUser);
+
+router.get("/most-conserved", conservationControllers.getMostConservedArticles);
 
 router.get(
-  "/conservations/mostConserved",
-  conservationControllers.getMostConservedArticles
-);
-
-router.get(
-  "/conservations/totalConservators/:articleId",
+  "/total-conservators/:articleId",
   conservationControllers.getTotalConservators
 );
 
@@ -41,7 +35,7 @@ DELETE
 - deleteConservation
 -------------------------------------------------------------*/
 router.delete(
-  "/conservations/deleteConservation",
+  "/delete-conservation",
   verifyStatus,
   conservationControllers.deleteConservation
 );

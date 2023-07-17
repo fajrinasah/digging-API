@@ -24,11 +24,13 @@ PATCH
 -------------------------------------------------------------*/
 
 router.patch("/change-about", verifyUser, profileControllers.changeAbout);
+
 router.patch(
   "/change-display-name",
   verifyUser,
   profileControllers.changeDisplayName
 );
+
 router.patch(
   "/change-photo-profile",
   verifyUser,

@@ -15,7 +15,7 @@ GET
 getArticleData
 -------------------------------------------------------------*/
 // GET ARTICLE'S DATA
-router.get("/article/:articleId", articleControllers.getArticleData);
+router.get("/:articleId", articleControllers.getArticleData);
 
 /*------------------------------------------------------------
 POST
@@ -23,7 +23,7 @@ postArticleData
 -------------------------------------------------------------*/
 // POST ARTICLE'S DATA
 router.post(
-  "/article/publish",
+  "/publish",
   verifyStatus,
   uploader.single("data"),
   articleControllers.postArticleData
@@ -35,7 +35,7 @@ patchArticleData
 -------------------------------------------------------------*/
 // PATCH ARTICLE'S DATA
 router.patch(
-  "/article/edit/:articleId",
+  "/edit/:articleId",
   verifyUser,
   articleControllers.patchArticleData
 );
@@ -46,7 +46,7 @@ deleteArticleData
 -------------------------------------------------------------*/
 // DELETE ARTICLE'S DATA
 router.delete(
-  "/article/bury/:articleId",
+  "/bury/:articleId",
   verifyUser,
   articleControllers.deleteArticleData
 );

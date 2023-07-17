@@ -14,7 +14,12 @@ import * as emoji from "node-emoji";
 /*-------------------------------------------------------*/
 // IMPORT ROUTERS
 /*-------------------------------------------------------*/
+import articleRouters from "./src/controllers/article/routers.js";
+import articlesRouters from "./src/controllers/articles/routers.js";
 import authRouters from "./src/controllers/authentication/routers.js";
+import categoriesRouters from "./src/controllers/categories/routers.js";
+import conservationRouters from "./src/controllers/conservation/routers.js";
+import profileRouters from "./src/controllers/profile/routers.js";
 
 const app = express();
 dotenv.config();
@@ -63,16 +68,21 @@ app.get("/", (req, res) => {
 /*-------------------------------------------------------*/
 // USE ROUTERS
 /*-------------------------------------------------------*/
+app.use("/api/article", articleRouters);
+app.use("/api/articles", articlesRouters);
 app.use("/api/auth", authRouters);
+app.use("/api/categories", categoriesRouters);
+app.use("/api/conservations", conservationRouters);
+app.use("/api/profile", profileRouters);
 
 /*-------------------------------------------------------*/
 // USE ERROR HANDLER
 /*-------------------------------------------------------*/
 app.use(middlewares.errorHandler);
+
 /*-------------------------------------------------------*/
 // LISTEN TO PORT
 /*-------------------------------------------------------*/
-
 const PORT = process.env.PORT;
 app.listen(PORT, () =>
   console.log(chalk.bgGreenBright("Server running") + ` on port ${PORT}`)

@@ -10,20 +10,14 @@ GET
 - getPublishedArticlesFromUser
 - getTotalArticlesInACategory
 -------------------------------------------------------------*/
-router.get("/articles", articlesControllers.getArticlesToDig);
+router.get("/dig", articlesControllers.getArticlesToDig);
+
+router.get("/carousel/:totalArticles", articlesControllers.getCarouselArticles);
+
+router.get("/:username", articlesControllers.getPublishedArticlesFromUser);
 
 router.get(
-  "/articles/carousel/:totalArticles",
-  articlesControllers.getCarouselArticles
-);
-
-router.get(
-  "/articles/:username",
-  articlesControllers.getPublishedArticlesFromUser
-);
-
-router.get(
-  "/articles/totalInCategory/:categoryId",
+  "/total-in-a-category/:categoryId",
   articlesControllers.getTotalArticlesInACategory
 );
 
