@@ -1,6 +1,9 @@
 import * as Yup from "yup";
 
-export const ArticleValidationSchema = Yup.object({
+/*----------------------------------------------------
+ARTICLE VALIDATION SCHEMA
+-----------------------------------------------------*/
+export const articleValidationSchema = Yup.object({
   category_id: Yup.number("category_id data type is number."),
 
   headline: Yup.string()
