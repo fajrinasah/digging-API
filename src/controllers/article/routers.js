@@ -50,3 +50,5 @@ router.delete(
   verifyUser,
   articleControllers.deleteArticleData
 );
+
+export default router;
