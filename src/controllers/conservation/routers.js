@@ -31,7 +31,10 @@ router.get(
   conservationControllers.getMostConservedArticles
 );
 
-router.get("/conservations/totalConservators/:articleId");
+router.get(
+  "/conservations/totalConservators/:articleId",
+  conservationControllers.getTotalConservators
+);
 
 /*------------------------------------------------------------
 DELETE
