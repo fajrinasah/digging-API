@@ -12,8 +12,14 @@ GET
 - getTotalArticlesInACategory
 -------------------------------------------------------------*/
 router.get("/articles", articlesControllers.getArticlesToDig);
-router.get("/articles/carousel/:totalArticles");
+
+router.get(
+  "/articles/carousel/:totalArticles",
+  articlesControllers.getCarouselArticles
+);
+
 router.get("/articles/:username");
+
 router.get("/articles/totalInCategory/:categoryId");
 
 export default router;
