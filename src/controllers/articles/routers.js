@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { verifyUser, verifyStatus } from "../../middlewares/index.js";
 import * as articlesControllers from "./index.js";
 
 const router = Router();
@@ -23,6 +22,9 @@ router.get(
   articlesControllers.getPublishedArticlesFromUser
 );
 
-router.get("/articles/totalInCategory/:categoryId");
+router.get(
+  "/articles/totalInCategory/:categoryId",
+  articlesControllers.getTotalArticlesInACategory
+);
 
 export default router;
