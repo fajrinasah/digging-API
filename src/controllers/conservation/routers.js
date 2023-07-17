@@ -21,7 +21,10 @@ GET
 - getMostConservedArticles
 - getTotalConservators
 -------------------------------------------------------------*/
-router.get("/conservations/:username");
+router.get(
+  "/conservations/:username",
+  conservationControllers.getConservedArticlesFromUser
+);
 
 router.get("/conservations/mostConserved");
 
