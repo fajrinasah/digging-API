@@ -18,7 +18,10 @@ router.get(
   articlesControllers.getCarouselArticles
 );
 
-router.get("/articles/:username");
+router.get(
+  "/articles/:username",
+  articlesControllers.getPublishedArticlesFromUser
+);
 
 router.get("/articles/totalInCategory/:categoryId");
 
