@@ -67,7 +67,7 @@ export const register = async (req, res, next) => {
     });
 
     // SEND RESPONSE
-    res.header("Authorization", `Bearer ${accessToken}`).status(200).json({
+    res.header("Authorization", `Bearer ${accessToken}`).status(201).json({
       message: "Account was created successfully.",
       user,
     });
