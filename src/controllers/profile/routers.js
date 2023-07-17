@@ -10,6 +10,19 @@ const router = Router();
 const storage = createCloudinaryStorage("profiles");
 const uploader = createUploader(storage);
 
+/*------------------------------------------------------------
+GET
+- getUserProfile
+-------------------------------------------------------------*/
+router.get("/:username", profileControllers.getUserProfile);
+
+/*------------------------------------------------------------
+PATCH
+- changeAbout
+- changeDisplayName
+- changePhotoProfile
+-------------------------------------------------------------*/
+
 router.patch("/change-about", verifyUser, profileControllers.changeAbout);
 router.patch(
   "/change-display-name",
