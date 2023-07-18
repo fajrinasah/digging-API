@@ -3,4 +3,5 @@ export * from "./loginValidationSchema.js";
 export * from "./passwordValidationSchema.js";
 export * from "./phoneNumberValidationSchema.js";
 export * from "./registerValidationSchema.js";
+export * from "./requestOtpValidationSchema.js";
 export * from "./usernameValidationSchema.js";
