@@ -5,7 +5,9 @@ import { Category } from "../../models/category.js";
 /*----------------------------------------------------*/
 export const getAllCategories = async (req, res, next) => {
   try {
-    const categories = await Category?.findAll();
+    const categories = await Category?.findAll({
+      order: [["id", "ASC"]],
+    });
 
     // SEND RESPONSE
     res.status(200).json({
