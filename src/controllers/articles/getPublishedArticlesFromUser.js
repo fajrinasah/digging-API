@@ -1,34 +1,112 @@
 import * as errorStatus from "../../middlewares/globalErrorHandler/errorStatus.js";
 import * as errorMessage from "../../middlewares/globalErrorHandler/errorMessage.js";
-import * as articles from "../../database/queriesForViews/articles/index.js";
+import {
+  Article,
+  Category,
+  Profile,
+  User,
+} from "../../models/associations/index.js";
 
 /*----------------------------------------------------*/
 // GET PUBLISHED ARTICLES FROM A USER
 /*----------------------------------------------------*/
-export const getPublishedArticlesFromUser = (req, res) => {
-  // writer's username
-  const { username } = req.params;
+export const getPublishedArticlesFromUser = async (req, res, next) => {
+  try {
+    // writer's username
+    const { username } = req.params;
 
-  // get data from req query (if any)
-  const categoryId = req.query.categoryId ? req.query.categoryId : 0;
-  const headline = req.query.headline ? req.query.headline : "";
-  const keywords = req.query.keywords ? req.query.keywords : "";
-  const sort = req.query.sort ? req.query.sort : "DESC";
+    const { categoryId, headline, keywords, sort, page } = req.query;
 
-  articles.executeSelectPublishedArticlesFromUser({
-    username,
-    filterByCategory: categoryId,
-    filterByHeadline: headline,
-    filterByKeywords: keywords,
-    sortingOption: sort,
-  });
-
-  if (err) {
-    return res.status(errorStatus.DEFAULT_ERROR_STATUS).json({
-      message: errorMessage.SOMETHING_WENT_WRONG,
-      error: err,
+    // writer's data
+    const user = await User?.findOne({
+      where: { username },
     });
-  }
 
-  return res.status(200).send(results);
+    const profile = await Profile?.findOne({
+      where: { user_id: user?.dataValues?.id },
+    });
+
+    const writer = profile?.dataValues?.id;
+    /*------------------------------------------------------*/
+    // PAGINATION OPTIONS
+    const options = {
+      offset: page > 1 ? parseInt(page - 1) * 5 : 0,
+      limit: page ? 5 : null,
+    };
+
+    /*------------------------------------------------------*/
+
+    // WHERE CONDITION(S)
+    const whereCondition = { profile_id: writer };
+
+    if (categoryId) {
+      whereCondition.category_id = categoryId;
+    }
+
+    if (headline) {
+      whereCondition.headline = { [Op.substring]: headline };
+    }
+
+    if (keywords) {
+      whereCondition.keywords = { [Op.substring]: keywords };
+    }
+
+    console.log(whereCondition);
+
+    /*------------------------------------------------------*/
+
+    const article = await Article.findAll({
+      attributes: { exclude: ["profile_id", "category_id"] },
+
+      where: whereCondition,
+
+      include: [
+        {
+          model: Category,
+          attributes: ["id", ["category", "name"]],
+          required: true,
+        },
+        {
+          model: Profile,
+          attributes: ["display_name", "photo_profile", "about"],
+          include: {
+            model: User,
+            attributes: ["username"],
+            required: true,
+          },
+          required: true,
+        },
+      ],
+
+      order: [sort === "ASC" ? ["id", "ASC"] : ["id", "DESC"]],
+
+      // PAGINATION OPTIONS
+      ...options,
+    });
+
+    //
+    const total_articles = await Article?.count({
+      where: { profile_id: writer },
+    });
+
+    const total_pages = page ? Math.ceil(total_articles / options.limit) : null;
+
+    // CHECK IF THERE'S NO DATA
+    if (!article.length)
+      throw {
+        status: errorStatus.NOT_FOUND_STATUS,
+        message: errorMessage.DATA_NOT_FOUND,
+      };
+
+    // SEND RESPONSE
+    res.status(200).json({
+      page,
+      total_pages,
+      total_articles,
+      articles_limit: options.limit,
+      article,
+    });
+  } catch (error) {
+    next(error);
+  }
 };

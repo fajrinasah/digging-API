@@ -1,30 +1,97 @@
 import * as errorStatus from "../../middlewares/globalErrorHandler/errorStatus.js";
 import * as errorMessage from "../../middlewares/globalErrorHandler/errorMessage.js";
-import * as articles from "../../database/queriesForViews/articles/index.js";
+import {
+  Article,
+  Category,
+  Profile,
+  User,
+} from "../../models/associations/index.js";
 
 /*----------------------------------------------------*/
 // GET ARTICLES TO DIG
 /*----------------------------------------------------*/
-export const getArticlesToDig = (req, res) => {
-  // get data from req query (if any)
-  const categoryId = req.query?.categoryId ? req.query.categoryId : 0;
-  const headline = req.query?.headline ? req.query.headline : "";
-  const keywords = req.query?.keywords ? req.query.keywords : "";
-  const sort = req.query?.sort ? req.query.sort : "DESC";
+export const getArticlesToDig = async (req, res, next) => {
+  try {
+    const { categoryId, headline, keywords, sort, page } = req.query;
 
-  articles.executeSelectArticlesToDig({
-    filterByCategory: categoryId,
-    filterByHeadline: headline,
-    filterByKeywords: keywords,
-    sortingOption: sort,
-  });
+    /*------------------------------------------------------*/
+    // PAGINATION OPTIONS
+    const options = {
+      offset: page > 1 ? parseInt(page - 1) * 5 : 0,
+      limit: page ? 5 : null,
+    };
 
-  if (err) {
-    return res.status(errorStatus.DEFAULT_ERROR_STATUS).json({
-      message: errorMessage.SOMETHING_WENT_WRONG,
-      error: err,
+    /*------------------------------------------------------*/
+
+    // WHERE CONDITION(S)
+    const whereCondition = {};
+
+    if (categoryId) {
+      whereCondition.category_id = categoryId;
+    }
+
+    if (headline) {
+      whereCondition.headline = { [Op.substring]: headline };
+    }
+
+    if (keywords) {
+      whereCondition.keywords = { [Op.substring]: keywords };
+    }
+
+    console.log(whereCondition);
+
+    /*------------------------------------------------------*/
+
+    const article = await Article.findAll({
+      attributes: { exclude: ["profile_id", "category_id"] },
+
+      where: whereCondition,
+
+      include: [
+        {
+          model: Category,
+          attributes: ["id", ["category", "name"]],
+          required: true,
+        },
+        {
+          model: Profile,
+          attributes: ["display_name", "photo_profile", "about"],
+          include: {
+            model: User,
+            attributes: ["username"],
+            required: true,
+          },
+          required: true,
+        },
+      ],
+
+      order: [sort === "ASC" ? ["id", "ASC"] : ["id", "DESC"]],
+
+      // PAGINATION OPTIONS
+      ...options,
     });
-  }
 
-  return res.status(200).send(results);
+    //
+    const total_articles = await Article?.count();
+
+    const total_pages = page ? Math.ceil(total_articles / options.limit) : null;
+
+    // CHECK IF THERE'S NO DATA
+    if (!article.length)
+      throw {
+        status: errorStatus.NOT_FOUND_STATUS,
+        message: errorMessage.DATA_NOT_FOUND,
+      };
+
+    // SEND RESPONSE
+    res.status(200).json({
+      page,
+      total_pages,
+      total_articles,
+      articles_limit: options.limit,
+      article,
+    });
+  } catch (error) {
+    next(error);
+  }
 };

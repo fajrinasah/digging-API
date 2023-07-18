@@ -15,7 +15,9 @@ export const getConservedArticlesFromUser = async (req, res, next) => {
   try {
     // conservator's username
     const { username } = req.params;
+
     const { categoryId, headline, keywords, sort, page } = req.query;
+
     // conservator's data
     const user = await User?.findOne({
       where: { username },
@@ -89,7 +91,7 @@ export const getConservedArticlesFromUser = async (req, res, next) => {
       ...options,
     });
 
-    //
+    // COUNT TOTAL OF CONSERVATIONS
     const total_conservations = await Conservation?.count({
       where: { conservator_id: conservator },
     });
