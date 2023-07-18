@@ -15,7 +15,7 @@ GET
 getArticleData
 -------------------------------------------------------------*/
 // GET ARTICLE'S DATA
-router.get("/:articleId", articleControllers.getArticleData);
+router.get("/data/:articleId", articleControllers.getArticleData);
 
 /*------------------------------------------------------------
 POST

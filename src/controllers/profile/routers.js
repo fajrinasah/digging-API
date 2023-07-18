@@ -23,16 +23,16 @@ PATCH
 - changePhotoProfile
 -------------------------------------------------------------*/
 
-router.patch("/change-about", verifyUser, profileControllers.changeAbout);
+router.patch("/change/about", verifyUser, profileControllers.changeAbout);
 
 router.patch(
-  "/change-display-name",
+  "/change/display-name",
   verifyUser,
   profileControllers.changeDisplayName
 );
 
 router.patch(
-  "/change-photo-profile",
+  "/change/photo-profile",
   verifyUser,
   uploader.single("file"),
   profileControllers.changePhotoProfile

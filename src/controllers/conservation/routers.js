@@ -21,7 +21,10 @@ GET
 - getMostConservedArticles
 - getTotalConservators
 -------------------------------------------------------------*/
-router.get("/:username", conservationControllers.getConservedArticlesFromUser);
+router.get(
+  "/by/:username",
+  conservationControllers.getConservedArticlesFromUser
+);
 
 router.get("/most-conserved", conservationControllers.getMostConservedArticles);
 
@@ -35,7 +38,7 @@ DELETE
 - deleteConservation
 -------------------------------------------------------------*/
 router.delete(
-  "/delete-conservation",
+  "/conservation",
   verifyStatus,
   conservationControllers.deleteConservation
 );

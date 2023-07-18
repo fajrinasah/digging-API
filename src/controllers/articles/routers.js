@@ -14,10 +14,10 @@ router.get("/dig", articlesControllers.getArticlesToDig);
 
 router.get("/carousel/:totalArticles", articlesControllers.getCarouselArticles);
 
-router.get("/:username", articlesControllers.getPublishedArticlesFromUser);
+router.get("/by/:username", articlesControllers.getPublishedArticlesFromUser);
 
 router.get(
-  "/total-in-a-category/:categoryId",
+  "/total-in-category/:categoryId",
   articlesControllers.getTotalArticlesInACategory
 );
 

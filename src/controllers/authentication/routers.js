@@ -22,14 +22,14 @@ router.get("/keep-login", verifyUser, authControllers.keepLogin);
 PATCH
 -------------------------------------------------------------*/
 router.patch("/reset-password", verifyUser, authControllers.resetPassword);
-router.patch("/change-password", verifyUser, authControllers.changePassword);
-router.patch("/change-email", verifyUser, authControllers.changeEmail);
+router.patch("/change/password", verifyUser, authControllers.changePassword);
+router.patch("/change/email", verifyUser, authControllers.changeEmail);
 router.patch(
-  "/change-phone-number",
+  "/change/phone-number",
   verifyUser,
   authControllers.changePhoneNumber
 );
-router.patch("/change-username", verifyUser, authControllers.changeUsername);
+router.patch("/change/username", verifyUser, authControllers.changeUsername);
 
 /*------------------------------------------------------------
 DELETE
