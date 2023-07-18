@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { verifyUser, verifyStatus } from "../../middlewares/index.js";
+import {
+  articleDataValidator,
+  mainshotDestroyer,
+  verifyUser,
+  verifyStatus,
+} from "../../middlewares/index.js";
 import * as articleControllers from "./index.js";
 import {
   createUploader,
@@ -7,7 +12,7 @@ import {
 } from "../../helpers/imageUploader.js";
 
 const router = Router();
-const storage = createCloudinaryStorage("profiles");
+const storage = createCloudinaryStorage("mainshots");
 const uploader = createUploader(storage);
 
 /*------------------------------------------------------------
@@ -22,10 +27,21 @@ POST
 postArticleData
 -------------------------------------------------------------*/
 // POST ARTICLE'S DATA
+
+// USING ARTICLE DATA VALIDATOR MIDDLEWARE
+// router.post(
+//   "/publish",
+//   verifyStatus,
+//   articleDataValidator,
+//   uploader.single("file"),
+//   articleControllers.postArticleData
+// );
+
+// NOT USING ARTICLE DATA VALIDATOR MIDDLEWARE
 router.post(
   "/publish",
   verifyStatus,
-  uploader.single("data"),
+  uploader.single("file"),
   articleControllers.postArticleData
 );
 
@@ -38,6 +54,15 @@ router.patch(
   "/edit/:articleId",
   verifyUser,
   articleControllers.patchArticleData
+);
+
+// PATCH ARTICLE'S DATA
+router.patch(
+  "/edit/mainshot/:articleId",
+  verifyUser,
+  mainshotDestroyer,
+  uploader.single("file"),
+  articleControllers.patchArticleMainshot
 );
 
 /*------------------------------------------------------------

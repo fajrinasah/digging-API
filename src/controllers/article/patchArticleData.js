@@ -41,7 +41,7 @@ export const patchArticleData = async (req, res, next) => {
         status: errorStatus.UNAUTHORIZED_STATUS,
         message:
           errorMessage.UNAUTHORIZED +
-          `Only article's writer can edit article's data.`,
+          `: only article's writer can edit article's data.`,
       };
 
     /*-------------------------------------------------------
@@ -96,20 +96,25 @@ export const patchArticleData = async (req, res, next) => {
     }
 
     // UPDATE ARTICLE'S DATA BASED ON CREATED UPDATE QUERY
-    const updatedArticleData = await Article.update(updateQuery, {
+    await Article.update(updateQuery, {
       where: { id: articleId },
     });
+
+    // GET UPDATED ARTICLE DATA
+    const updatedArticle = await Article?.findOne({
+      where: { id: articleId },
+    });
+
+    delete updatedArticle?.dataValues?.profile_id;
 
     // COMMIT TRANSACTION
     await transaction.commit();
 
     // SEND RESPONSE
-    res
-      .status(200)
-      .json({
-        message: "Article was edited successfully.",
-        updatedArticleData,
-      });
+    res.status(200).json({
+      message: "Article was edited successfully.",
+      article: updatedArticle,
+    });
   } catch (error) {
     // ROLLBACK TRANSACTION IF THERE'S ANY ERROR
     await transaction.rollback();

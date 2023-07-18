@@ -13,10 +13,12 @@ export const getArticleData = async (req, res, next) => {
       where: { article_id: articleId },
     });
 
+    delete articleData?.dataValues?.profile_id;
+
     if (!articleData)
       throw {
         status: errorStatus.BAD_REQUEST_STATUS,
-        message: errorMessage.BAD_REQUEST + `Article not found.`,
+        message: errorMessage.BAD_REQUEST + `: article not found.`,
       };
 
     // SEND RESPONSE

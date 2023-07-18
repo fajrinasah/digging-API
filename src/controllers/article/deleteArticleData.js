@@ -37,7 +37,7 @@ export const deleteArticleData = async (req, res, next) => {
         status: errorStatus.UNAUTHORIZED_STATUS,
         message:
           errorMessage.UNAUTHORIZED +
-          `Only article's writer can delete article's data.`,
+          `: only article's writer can delete article's data.`,
       };
 
     // DELETE ARTICLE'S DATA
