@@ -2,6 +2,7 @@ import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import path from "path";
+
 import * as config from "../configs/index.js";
 
 /* --------------------------------------------------------*/
@@ -44,5 +45,5 @@ export const createCloudinaryStorage = (directory) =>
 export const createUploader = (storage) =>
   multer({
     storage: storage,
-    limits: { fileSize: 1000000 }, // @1MB
+    limits: { fileSize: 1000000 },
   });

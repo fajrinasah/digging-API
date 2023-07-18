@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { verifyUser } from "../../middlewares/index.js";
+import { verifyUser, imageDestroyer } from "../../middlewares/index.js";
 import * as profileControllers from "./index.js";
 import {
   createUploader,
@@ -34,6 +34,7 @@ router.patch(
 router.patch(
   "/change/photo-profile",
   verifyUser,
+  imageDestroyer,
   uploader.single("file"),
   profileControllers.changePhotoProfile
 );

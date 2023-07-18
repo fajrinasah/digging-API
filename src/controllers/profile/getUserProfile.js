@@ -28,7 +28,7 @@ export const getUserProfile = async (req, res, next) => {
     });
 
     // COMPILE PUBLIC USER'S DATA AND PROFILE
-    const data = {
+    const userData = {
       username,
       display_name: profile?.dataValues?.display_name,
       photo_profile: profile?.dataValues?.photo_profile,
@@ -37,7 +37,7 @@ export const getUserProfile = async (req, res, next) => {
 
     // SEND RESPONSE
     res.status(200).json({
-      data,
+      userData,
     });
   } catch (error) {
     next(error);

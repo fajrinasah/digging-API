@@ -1,4 +1,5 @@
 export * from "./globalErrorHandler/errorHandler.js";
+export * from "./imageDestroyer/imageDestroyer.js";
 export * from "./loggers/requestLogger.js";
 export * from "./verifyFromToken/verifyStatus.js";
 export * from "./verifyFromToken/verifyUser.js";
