@@ -13,16 +13,20 @@ export const keepLogin = async (req, res, next) => {
       where: { user_id: user?.dataValues?.id },
     });
 
-    // CLEAN UP DATA BEFORE SEND A RESPONSE
-    delete user?.dataValues?.id;
-    delete user?.dataValues?.password;
-    delete user?.dataValues?.otp;
-    delete user?.dataValues?.otp_exp;
-    delete profile?.dataValues?.id;
-    delete profile?.dataValues?.user_id;
+    // COMPILE PUBLIC USER'S DATA AND PROFILE
+    const userData = {
+      email: user?.dataValues?.email,
+      phone_number: user?.dataValues?.phone_number,
+      username: user?.dataValues?.username,
+      display_name: profile?.dataValues?.display_name,
+      photo_profile: profile?.dataValues?.photo_profile,
+      about: profile?.dataValues?.about,
+      role_id: user?.dataValues?.role_id,
+      status_id: user?.dataValues?.status_id,
+    };
 
     // SEND RESPONSE
-    res.status(200).json({ user, profile });
+    res.status(200).json({ userData });
   } catch (error) {
     next(error);
   }

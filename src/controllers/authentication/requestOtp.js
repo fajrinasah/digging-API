@@ -1,7 +1,9 @@
+import { ValidationError } from "yup";
 import handlebars from "handlebars";
 import fs from "fs";
 import path from "path";
 import moment from "moment";
+import chalk from "chalk";
 
 import * as config from "../../configs/index.js";
 import * as helpers from "../../helpers/index.js";
@@ -9,6 +11,7 @@ import * as errorStatus from "../../middlewares/globalErrorHandler/errorStatus.j
 import * as errorMessage from "../../middlewares/globalErrorHandler/errorMessage.js";
 import { User } from "../../models/associations/user.profile.js";
 import db from "../../database/index.js";
+import * as validation from "./validationSchemata/index.js";
 
 /*----------------------------------------------------*/
 // GENERAL OTP REQUEST
@@ -19,10 +22,23 @@ export const requestOtp = async (req, res, next) => {
 
   try {
     const { email, context } = req.body;
+    await validation.requestOtpValidationSchema.validate(req.body);
+
+    // UUID CONTEXT IN REDIRECT URL BASED ON CONTEXT FROM REQ.BODY
+    /*----------------------------------------------------------
+    "reset password" = rpw
+    "change data" = cdt
+        --> for change password, email, username, or phone number
+    -----------------------------------------------------------*/
+    if (context !== "reset password" && context !== "change data")
+      throw {
+        status: errorStatus.BAD_REQUEST_STATUS,
+        message: errorMessage.BAD_REQUEST + `: context is not valid.`,
+      };
 
     // CHECK IF USER EXIST
     const user = await User?.findOne({ where: { email } });
-    if (!user)
+    if (!user || user?.dataValues?.status_id === 3)
       throw {
         status: errorStatus.BAD_REQUEST_STATUS,
         message: errorMessage.USER_DOES_NOT_EXISTS,
@@ -35,7 +51,7 @@ export const requestOtp = async (req, res, next) => {
     await User?.update(
       {
         otp: otpToken,
-        otp_exp: moment().add(1, "days").format("YYYY-MM-DD HH:mm:ss"),
+        otp_exp: moment().add(5, "minutes").format("YYYY-MM-DD HH:mm:ss"),
       },
       { where: { email } }
     );
@@ -44,6 +60,7 @@ export const requestOtp = async (req, res, next) => {
     const template = fs.readFileSync(
       path.join(
         process.cwd(),
+        "src",
         "views",
         "generalOtpVerification",
         "generalOtpVerification.html"
@@ -51,12 +68,15 @@ export const requestOtp = async (req, res, next) => {
       "utf8"
     );
 
-    // UUID CONTEXT IN REDIRECT URL BASED ON CONTEXT FROM REQ.BODY
-    /*----------------------------------------------------------
-    "reset password" = rpw
-    "change data" = cdt
-        --> for change password, email, username, or phone number
-    -----------------------------------------------------------*/
+    // IF USER WANTS TO CHANGE DATA, CHECK IF USER STATUS IS UNVERIFIED
+    if (context === "change data" && user?.dataValues?.status_id === 1)
+      throw {
+        status: errorStatus.BAD_REQUEST_STATUS,
+        message:
+          errorMessage.UNAUTHORIZED +
+          `: user status is unverified. Please verify your account first before changing crucial data.`,
+      };
+
     const linkContext = context === "reset password" ? "rpw" : "cdt";
 
     const emailData = handlebars.compile(template)({
@@ -88,6 +108,17 @@ export const requestOtp = async (req, res, next) => {
         "OTP token was sent successfully. Pleasse check your email to verify.",
     });
   } catch (error) {
+    // CHECK IF THE ERROR COMES FROM VALIDATION
+    if (error instanceof ValidationError) {
+      console.error(chalk.bgRedBright("Validation Error: "));
+
+      return next({
+        status: errorStatus.BAD_REQUEST_STATUS,
+        message: error?.errors?.[0],
+      });
+    }
+
+    // PASS TO GLOBAL ERROR HANDLER
     next(error);
   }
 };

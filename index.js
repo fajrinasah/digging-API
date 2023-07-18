@@ -4,7 +4,9 @@ import dotenv from "dotenv";
 import cors from "cors";
 
 import connection from "./src/configs/conection.config.js";
+import client from "./src/configs/redis.config.js";
 import * as middlewares from "./src/middlewares/index.js";
+import * as helpers from "./src/helpers/index.js";
 import db from "./src/database/index.js";
 // import { associations } from "./src/models/associations.js";
 
@@ -31,32 +33,40 @@ app.use(middlewares.requestLogger);
 /*-------------------------------------------------------*/
 // TEST CONNECTION TO DATABASE
 /*-------------------------------------------------------*/
-// USING SEQUELIZE
-async function testConnection() {
-  try {
-    await db.sequelize.authenticate();
-    console.log(
-      chalk.bgGreenBright("Connection with database using sequelize") +
-        " has been established successfully." +
-        emoji.get("white_check_mark")
-    );
-  } catch (error) {
-    console.error("Unable to connect to the database:", error);
-  }
-}
+helpers.connect.withMySql2();
+helpers.connect.withRedis();
+helpers.connect.withSequelize();
+// // USING SEQUELIZE
+// async function testConnection() {
+//   try {
+//     await db.sequelize.authenticate();
+//     console.log(
+//       chalk.bgGreenBright.bold("Connection with database using sequelize") +
+//         " has been established successfully." +
+//         emoji.get("white_check_mark")
+//     );
+//   } catch (error) {
+//     console.error("Unable to connect to the database with sequelize:", error);
+//   }
+// }
 
-testConnection();
+// testConnection();
 
-// USING MYSQL2 (for views)
-connection.connect((err) => {
-  if (err) {
-    return console.error(`error: ${err.message}`);
-  }
-  console.log(
-    chalk.white.bgGreenBright.bold(`Connected to the database using mysql2`) +
-      emoji.get("white_check_mark")
-  );
-});
+// // USING MYSQL2 (for views)
+// connection.connect((err) => {
+//   if (err) {
+//     return console.error(
+//       chalk.bgRedBright(
+//         "Unable to connect to the database with mysql2: " + err.message
+//       )
+//     );
+//   }
+
+//   console.log(
+//     chalk.white.bgGreenBright.bold(`Connected to the database using mysql2 `) +
+//       emoji.get("white_check_mark")
+//   );
+// });
 
 /*-------------------------------------------------------*/
 // DEFINE ROOT ROUTE

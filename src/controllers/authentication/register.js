@@ -52,12 +52,19 @@ export const register = async (req, res, next) => {
     });
 
     // INSERT NEW DATA TO PROFILES TABLE
-    await Profile?.create({ user_id: user?.dataValues?.id });
+    const profile = await Profile?.create({ user_id: user?.dataValues?.id });
 
-    // CLEAN UP DATA BEFORE SEND THEM BACK TO CLIENT
-    delete user?.dataValues?.password;
-    delete user?.dataValues?.otp;
-    delete user?.dataValues?.otp_exp;
+    // COMPILE PUBLIC USER'S DATA AND PROFILE
+    const userData = {
+      email: user?.dataValues?.email,
+      phone_number: user?.dataValues?.phone_number,
+      username: user?.dataValues?.username,
+      display_name: profile?.dataValues?.display_name,
+      photo_profile: profile?.dataValues?.photo_profile,
+      about: profile?.dataValues?.about,
+      role_id: user?.dataValues?.role_id,
+      status_id: user?.dataValues?.status_id,
+    };
 
     // GENERATE ACCESS TOKEN
     const accessToken = helpers.createToken({
@@ -68,8 +75,9 @@ export const register = async (req, res, next) => {
 
     // SEND RESPONSE
     res.header("Authorization", `Bearer ${accessToken}`).status(201).json({
-      message: "Account was created successfully.",
-      user,
+      message:
+        "Account was created successfully. Please check your email to verify.",
+      userData,
     });
 
     // COMPOSE "EMAIL VERIFICATION" MAIL

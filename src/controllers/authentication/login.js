@@ -1,14 +1,11 @@
 import { ValidationError } from "yup";
-import redis from "redis";
 
+import client from "../../configs/redis.config.js";
 import * as helpers from "../../helpers/index.js";
 import * as errorStatus from "../../middlewares/globalErrorHandler/errorStatus.js";
 import * as errorMessage from "../../middlewares/globalErrorHandler/errorMessage.js";
 import { User, Profile } from "../../models/associations/user.profile.js";
 import * as validation from "./validationSchemata/index.js";
-
-const client = redis.createClient();
-client.on("error", (err) => console.log("Redis Client Error", err));
 
 /*----------------------------------------------------*/
 // LOGIN
@@ -64,7 +61,6 @@ export const login = async (req, res, next) => {
     }
 
     // CHECK TOKEN IN REDIS
-    client.connect();
     const cachedToken = await client.get(userExists?.dataValues?.uuid);
     const tokenIsValid = cachedToken && helpers.verifyToken(cachedToken);
 
@@ -91,19 +87,23 @@ export const login = async (req, res, next) => {
       where: { user_id: userExists?.dataValues?.id },
     });
 
-    // CLEAN UP DATA BEFORE SEND A RESPONSE
-    delete userExists?.dataValues?.id;
-    delete userExists?.dataValues?.password;
-    delete userExists?.dataValues?.otp;
-    delete userExists?.dataValues?.otp_exp;
-    delete profile?.dataValues?.id;
-    delete profile?.dataValues?.user_id;
+    // COMPILE PUBLIC USER'S DATA AND PROFILE
+    const userData = {
+      email: userExists?.dataValues?.email,
+      phone_number: userExists?.dataValues?.phone_number,
+      username: userExists?.dataValues?.username,
+      display_name: profile?.dataValues?.display_name,
+      photo_profile: profile?.dataValues?.photo_profile,
+      about: profile?.dataValues?.about,
+      role_id: userExists?.dataValues?.role_id,
+      status_id: userExists?.dataValues?.status_id,
+    };
 
     // SEND RESPONSE
     res
       .header("Authorization", `Bearer ${accessToken}`)
       .status(200)
-      .json({ user: userExists, profile: profile });
+      .json({ userData });
   } catch (error) {
     // CHECK IF THE ERROR COMES FROM VALIDATION
     if (error instanceof ValidationError) {

@@ -25,10 +25,17 @@ export const resendEmailVerification = async (req, res, next) => {
 
     // CHECK IF USER EXIST
     const user = await User?.findOne({ where: { email: email } });
-    if (!user)
+    if (!user || user?.dataValues?.status_id === 3)
       throw {
         status: errorStatus.BAD_REQUEST_STATUS,
         message: errorMessage.USER_DOES_NOT_EXISTS,
+      };
+
+    if (user?.dataValues?.status_id === 2)
+      throw {
+        status: errorStatus.BAD_REQUEST_STATUS,
+        message:
+          errorMessage.INVALID_CREDENTIALS + `: account was already verified.`,
       };
 
     // GENERATE OTP TOKEN FOR VERIFICATION PROCESS
@@ -73,7 +80,8 @@ export const resendEmailVerification = async (req, res, next) => {
     });
 
     res.status(200).json({
-      message: "Email verification was sent successfully.",
+      message:
+        "Email verification was sent successfully. Please check your email to verify.",
     });
 
     // COMMIT TRANSACTION
