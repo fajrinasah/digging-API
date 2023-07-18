@@ -1,4 +1,6 @@
 import connection from "../configs/conection.config.js";
+import * as errorStatus from "../middlewares/globalErrorHandler/errorStatus.js";
+import * as errorMessage from "../middlewares/globalErrorHandler/errorMessage.js";
 
 /*=================================================
 EXECUTE FUNCTION GENERATOR
@@ -26,10 +28,15 @@ export const generateExecuteFunction = ({
 // WITHOUT PLACEHOLDERS
 export const generateQueryFunction = ({ queryStatements = "" }) => {
   return connection.query(queryStatements, function (err, results) {
-    if (err) {
-      console.error(err);
-      return err;
-    }
+    // if (err) {
+    //   console.error(err);
+    //   return err;
+    // }
+    if (err)
+      throw {
+        status: errorStatus.DEFAULT_ERROR_STATUS,
+        message: err.sqlState,
+      };
 
     console.log(results);
     return results;

@@ -1,4 +1,5 @@
 import * as errorStatus from "../../middlewares/globalErrorHandler/errorStatus.js";
+import * as errorMessage from "../../middlewares/globalErrorHandler/errorMessage.js";
 import { User, Profile } from "../../models/associations/user.profile.js";
 import { Conservation } from "../../models/conservation.js";
 import db from "../../database/index.js";
@@ -7,9 +8,6 @@ import db from "../../database/index.js";
 // DELETE CONSERVATION
 /*----------------------------------------------------*/
 export const deleteConservation = async (req, res, next) => {
-  // START TRANSACTION
-  const transaction = await db.sequelize.transaction();
-
   try {
     const { uuid } = req.user;
     const { article_id } = req.body;
@@ -31,6 +29,20 @@ export const deleteConservation = async (req, res, next) => {
     // GET CONSERVATOR'S ID
     const conservator_id = profile?.dataValues?.id;
 
+    // CHECK IF CONSERVATION EXISTS
+    const conservation = await Conservation?.findOne({
+      where: {
+        conservator_id,
+        article_id,
+      },
+    });
+
+    if (!conservation)
+      throw {
+        status: errorStatus.BAD_REQUEST_STATUS,
+        message: errorMessage.BAD_REQUEST + ": conservation not found.",
+      };
+
     // DELETE CONSERVATION DATA FROM DB
     await Conservation.destroy({
       where: {
@@ -39,17 +51,11 @@ export const deleteConservation = async (req, res, next) => {
       },
     });
 
-    // COMMIT TRANSACTION
-    await transaction.commit();
-
     // SEND RESPONSE
     res.status(200).json({
       message: "Conservation was deleted successfully.",
     });
   } catch (error) {
-    // ROLLBACK TRANSACTION IF THERE'S ANY ERROR
-    await transaction.rollback();
-
     next(error);
   }
 };

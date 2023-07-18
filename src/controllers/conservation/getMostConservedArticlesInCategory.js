@@ -10,10 +10,12 @@ import {
 } from "../../models/associations/index.js";
 
 /*----------------------------------------------------*/
-// GET MOST CONSERVED ARTICLES
+// GET MOST CONSERVED ARTICLES IN A CATEGORY
 /*----------------------------------------------------*/
-export const getMostConservedArticles = async (req, res, next) => {
+export const getMostConservedArticlesInCategory = async (req, res, next) => {
   try {
+    const { categoryId } = req.params;
+
     const most_conserved = await Conservation.findAll({
       attributes: [
         "article_id",
@@ -27,6 +29,7 @@ export const getMostConservedArticles = async (req, res, next) => {
 
       include: {
         model: Article,
+        where: { category_id: categoryId },
         attributes: { exclude: ["profile_id", "category_id"] },
         include: [
           {

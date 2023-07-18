@@ -29,6 +29,11 @@ router.get(
 router.get("/most-conserved", conservationControllers.getMostConservedArticles);
 
 router.get(
+  "/most-conserved/category/:categoryId",
+  conservationControllers.getMostConservedArticlesInCategory
+);
+
+router.get(
   "/total-conservators/:articleId",
   conservationControllers.getTotalConservators
 );

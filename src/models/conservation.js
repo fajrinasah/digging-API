@@ -23,5 +23,6 @@ export const Conservation = db.sequelize.define(
   },
   {
     tableName: "conservations",
+    timestamps: false,
   }
 );

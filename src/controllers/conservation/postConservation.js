@@ -1,18 +1,26 @@
 import * as errorStatus from "../../middlewares/globalErrorHandler/errorStatus.js";
+import * as errorMessage from "../../middlewares/globalErrorHandler/errorMessage.js";
 import { User, Profile } from "../../models/associations/user.profile.js";
 import { Conservation } from "../../models/conservation.js";
+import { Article } from "../../models/article.js";
 import db from "../../database/index.js";
 
 /*----------------------------------------------------*/
 // POST CONSERVATION
 /*----------------------------------------------------*/
 export const postConservation = async (req, res, next) => {
-  // START TRANSACTION
-  const transaction = await db.sequelize.transaction();
-
   try {
     const { uuid } = req.user;
-    const { article_id } = req.params;
+    const { articleId } = req.params;
+
+    // CHECK IF ARTICLE EXISTS
+    const article = await Article?.findOne({ where: { id: articleId } });
+
+    if (!article)
+      throw {
+        status: errorStatus.BAD_REQUEST_STATUS,
+        message: errorMessage.BAD_REQUEST + ": article not found.",
+      };
 
     // CHECK IF USER EXISTS
     const user = await User?.findOne({ where: { uuid } });
@@ -34,11 +42,10 @@ export const postConservation = async (req, res, next) => {
     // INSERT CONSERVATION DATA INTO DB
     const conservation = await Conservation?.create({
       conservator_id,
-      article_id,
+      article_id: articleId,
     });
 
-    // COMMIT TRANSACTION
-    await transaction.commit();
+    delete conservation?.dataValues?.conservator_id;
 
     // SEND RESPONSE
     res.status(201).json({
@@ -46,9 +53,6 @@ export const postConservation = async (req, res, next) => {
       conservation,
     });
   } catch (error) {
-    // ROLLBACK TRANSACTION IF THERE'S ANY ERROR
-    await transaction.rollback();
-
     next(error);
   }
 };
