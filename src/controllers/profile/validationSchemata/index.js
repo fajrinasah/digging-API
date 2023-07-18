@@ -1,2 +1,2 @@
-export * from "./aboutValidationSchema";
-export * from "./displayNameValidationSchema";
+export * from "./aboutValidationSchema.js";
+export * from "./displayNameValidationSchema.js";
