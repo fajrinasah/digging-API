@@ -1,3 +1,5 @@
+import { Op } from "sequelize";
+
 import * as errorStatus from "../../middlewares/globalErrorHandler/errorStatus.js";
 import * as errorMessage from "../../middlewares/globalErrorHandler/errorMessage.js";
 import {
@@ -71,8 +73,7 @@ export const getArticlesToDig = async (req, res, next) => {
       ...options,
     });
 
-    //
-    const total_articles = await Article?.count();
+    const total_articles = article.length;
 
     const total_pages = page ? Math.ceil(total_articles / options.limit) : null;
 

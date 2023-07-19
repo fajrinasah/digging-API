@@ -39,6 +39,22 @@ export const postConservation = async (req, res, next) => {
     // GET CONSERVATOR'S ID
     const conservator_id = profile?.dataValues?.id;
 
+    // CHECK IF USER ALREADY CONSERVED THE ARTICLE
+    const conservationExists = await Conservation?.findOne({
+      where: {
+        conservator_id,
+        article_id: articleId,
+      },
+    });
+
+    if (conservationExists)
+      throw {
+        status: errorStatus.BAD_REQUEST_STATUS,
+        message:
+          errorMessage.BAD_REQUEST +
+          ": article already conserved by this user.",
+      };
+
     // INSERT CONSERVATION DATA INTO DB
     const conservation = await Conservation?.create({
       conservator_id,

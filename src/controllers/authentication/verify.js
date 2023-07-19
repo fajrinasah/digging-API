@@ -50,7 +50,6 @@ export const verify = async (req, res, next) => {
       // SEND RESPONSE
       res.status(200).json({
         message: "Account was verified successfully.",
-        data: cleanedUuid,
       });
     }
 

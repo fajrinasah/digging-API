@@ -1,3 +1,5 @@
+import { Op } from "sequelize";
+
 import * as errorStatus from "../../middlewares/globalErrorHandler/errorStatus.js";
 import * as errorMessage from "../../middlewares/globalErrorHandler/errorMessage.js";
 import {
@@ -21,6 +23,13 @@ export const getPublishedArticlesFromUser = async (req, res, next) => {
     const user = await User?.findOne({
       where: { username },
     });
+
+    // CHECK IF USER EXISTS
+    if (!user || user?.dataValues?.status === 3)
+      throw {
+        status: errorStatus.BAD_REQUEST_STATUS,
+        message: errorMessage.USER_DOES_NOT_EXISTS,
+      };
 
     const profile = await Profile?.findOne({
       where: { user_id: user?.dataValues?.id },
@@ -84,10 +93,7 @@ export const getPublishedArticlesFromUser = async (req, res, next) => {
       ...options,
     });
 
-    //
-    const total_articles = await Article?.count({
-      where: { profile_id: writer },
-    });
+    const total_articles = article.length;
 
     const total_pages = page ? Math.ceil(total_articles / options.limit) : null;
 
