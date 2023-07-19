@@ -74,7 +74,8 @@ export const changeEmail = async (req, res, next) => {
 
     // SEND RESPONSE
     res.status(200).json({
-      message: "Email was successfully changed.",
+      message:
+        "Email was successfully changed. Please check your mailbox to verify.",
     });
   } catch (error) {
     // IF ERROR FROM VALIDATION
